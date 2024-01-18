@@ -1,5 +1,7 @@
 import path from "path";
 import { BuildMode, BuildPaths, BuildPlatform, buildWebpack } from "@packages/build-config";
+import webpack from "webpack";
+import packageJson from "./package.json";
 
 interface EnvVariables {
 	mode?: BuildMode;
@@ -19,11 +21,34 @@ export default (env: EnvVariables) => {
 
 	const config = buildWebpack({
 		mode: env.mode ?? "development",
-		port: 7777 ?? 5555,
+		port: env.port ?? 5556,
 		paths,
 		analyzer: env.analyzer,
 		platform: env.platform ?? "desktop"
 	});
+
+	config.plugins.push(new webpack.container.ModuleFederationPlugin({
+		name: "shop",
+		filename: "remoteEntry.js",
+		exposes: {
+			"./Router": "./src/router/Router.tsx"
+		},
+		shared: {
+			...packageJson.dependencies,
+			react: {
+				eager: true,
+				requiredVersion: packageJson.dependencies["react"]
+			},
+			"react-router-dom": {
+				eager: true,
+				requiredVersion: packageJson.dependencies["react-router-dom"]
+			},
+			"react-dom": {
+				eager: true,
+				requiredVersion: packageJson.dependencies["react-dom"]
+			}
+		}
+	}));
 
 	return config;
 };
