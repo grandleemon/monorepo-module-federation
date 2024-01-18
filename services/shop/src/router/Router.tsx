@@ -2,6 +2,7 @@ import { createBrowserRouter } from "react-router-dom";
 import { App } from "@/App";
 import { Suspense } from "react";
 import { LazyShop } from "@/pages/shop/Shop.lazy";
+import { shopRoutes } from "@packages/shared/src/routes/shop";
 
 const routes = [
 	{
@@ -9,11 +10,11 @@ const routes = [
 		element: <App/>,
 		children: [
 			{
-				path: "/shop/main",
+				path: shopRoutes.main,
 				element: <Suspense fallback="loading"><LazyShop/></Suspense>
 			},
 			{
-				path: "/shop/second",
+				path: shopRoutes.second,
 				element: <Suspense fallback="loading">
 					<div>second shop page</div>
 				</Suspense>
